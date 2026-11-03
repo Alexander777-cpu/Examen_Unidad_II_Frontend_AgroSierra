@@ -8,5 +8,7 @@ data class LotesUiState(
     val cargando: Boolean = false,
     val error: String? = null,
     val valleFiltro: String? = null,
-    val sesion: Sesion? = null
+    val sesion: Sesion? = null,
+    val sincronizando: Boolean = false,
+    val mensajeSync: String? = null
 )

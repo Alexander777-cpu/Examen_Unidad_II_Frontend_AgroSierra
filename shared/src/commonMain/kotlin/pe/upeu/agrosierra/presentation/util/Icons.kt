@@ -86,3 +86,81 @@ val Icons.Filled.VisibilityOff: ImageVector
     }
 
 private var _visibilityOff: ImageVector? = null
+
+val Icons.Filled.Schedule: ImageVector
+    get() {
+        if (_schedule != null) return _schedule!!
+        _schedule = ImageVector.Builder(
+            name = "Filled.Schedule",
+            defaultWidth = 24.0.dp,
+            defaultHeight = 24.0.dp,
+            viewportWidth = 24.0f,
+            viewportHeight = 24.0f
+        ).apply {
+            path(fill = SolidColor(Color.Black)) {
+                moveTo(11.99f, 2.0f)
+                curveTo(6.47f, 2.0f, 2.0f, 6.48f, 2.0f, 12.0f)
+                reflectiveCurveTo(6.47f, 22.0f, 11.99f, 22.0f)
+                reflectiveCurveTo(22.0f, 17.52f, 22.0f, 12.0f)
+                reflectiveCurveTo(17.51f, 2.0f, 11.99f, 2.0f)
+                close()
+                moveTo(12.0f, 20.0f)
+                curveTo(7.58f, 20.0f, 4.0f, 16.42f, 4.0f, 12.0f)
+                reflectiveCurveTo(7.58f, 4.0f, 12.0f, 4.0f)
+                reflectiveCurveTo(20.0f, 7.58f, 20.0f, 12.0f)
+                reflectiveCurveTo(16.42f, 20.0f, 12.0f, 20.0f)
+                close()
+                moveTo(12.5f, 7.0f)
+                horizontalLineTo(11.0f)
+                verticalLineTo(13.0f)
+                lineTo(16.25f, 16.15f)
+                lineTo(17.0f, 14.92f)
+                lineTo(12.5f, 12.25f)
+                verticalLineTo(7.0f)
+                close()
+            }
+        }.build()
+        return _schedule!!
+    }
+
+private var _schedule: ImageVector? = null
+
+val Icons.Filled.Sync: ImageVector
+    get() {
+        if (_sync != null) return _sync!!
+        _sync = ImageVector.Builder(
+            name = "Filled.Sync",
+            defaultWidth = 24.0.dp,
+            defaultHeight = 24.0.dp,
+            viewportWidth = 24.0f,
+            viewportHeight = 24.0f
+        ).apply {
+            path(fill = SolidColor(Color.Black)) {
+                moveTo(12.0f, 4.0f)
+                verticalLineTo(1.0f)
+                lineTo(8.0f, 5.0f)
+                lineToRelative(4.0f, 4.0f)
+                verticalLineTo(6.0f)
+                curveToRelative(3.31f, 0.0f, 6.0f, 2.69f, 6.0f, 6.0f)
+                curveToRelative(0.0f, 1.01f, -0.25f, 1.97f, -0.7f, 2.8f)
+                lineToRelative(1.46f, 1.46f)
+                curveTo(19.54f, 15.03f, 20.0f, 13.57f, 20.0f, 12.0f)
+                curveToRelative(0.0f, -4.42f, -3.58f, -8.0f, -8.0f, -8.0f)
+                close()
+                moveTo(12.0f, 18.0f)
+                curveToRelative(-3.31f, 0.0f, -6.0f, -2.69f, -6.0f, -6.0f)
+                curveToRelative(0.0f, -1.01f, 0.25f, -1.97f, 0.7f, -2.8f)
+                lineTo(5.24f, 7.74f)
+                curveTo(4.46f, 8.97f, 4.0f, 10.43f, 4.0f, 12.0f)
+                curveToRelative(0.0f, 4.42f, 3.58f, 8.0f, 8.0f, 8.0f)
+                verticalLineToRelative(3.0f)
+                lineToRelative(4.0f, -4.0f)
+                lineToRelative(-4.0f, -4.0f)
+                verticalLineToRelative(3.0f)
+                close()
+            }
+        }.build()
+        return _sync!!
+    }
+
+private var _sync: ImageVector? = null

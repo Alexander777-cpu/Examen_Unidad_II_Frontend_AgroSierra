@@ -10,5 +10,6 @@ data class DetalleLoteUiState(
     val cargando: Boolean = false,
     val error: String? = null,
     val sesion: Sesion? = null,
-    val mensajeExito: String? = null
+    val mensajeExito: String? = null,
+    val sincronizando: Boolean = false
 )

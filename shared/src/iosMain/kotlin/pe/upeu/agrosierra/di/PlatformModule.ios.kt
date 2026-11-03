@@ -1,5 +1,6 @@
 package pe.upeu.agrosierra.di
 
+import app.cash.sqldelight.db.SqlDriver
 import org.koin.core.module.Module
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
@@ -20,4 +21,5 @@ class AlmacenSeguroIos : AlmacenSeguro {
 actual val platformModule: Module = module {
     single<AlmacenSeguro> { AlmacenSeguroIos() }
     single(named("baseUrl")) { "http://localhost:8080/api/v1/" }
+    single<SqlDriver> { error("iOS SqlDriver not configured") }
 }
