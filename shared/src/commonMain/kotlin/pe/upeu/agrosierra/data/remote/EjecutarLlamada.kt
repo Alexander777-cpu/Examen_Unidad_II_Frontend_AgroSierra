@@ -62,11 +62,9 @@ fun parsearErroresValidacion(jsonStr: String): Map<String, String> {
     return try {
         val jsonObj = Json.parseToJsonElement(jsonStr).jsonObject
         val map = mutableMapOf<String, String>()
-        if (jsonObj.containsKey("errors")) {
-            val errorsObj = jsonObj["errors"]?.jsonObject
-            errorsObj?.forEach { (k, v) ->
-                map[k] = v.jsonPrimitive.content
-            }
+        val errorsObj = (jsonObj["validationErrors"] ?: jsonObj["errors"])?.jsonObject
+        errorsObj?.forEach { (k, v) ->
+            map[k] = v.jsonPrimitive.content
         }
         map
     } catch (_: Exception) {
