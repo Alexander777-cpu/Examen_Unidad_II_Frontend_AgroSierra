@@ -10,6 +10,7 @@ import io.ktor.client.plugins.logging.DEFAULT
 import io.ktor.client.plugins.logging.LogLevel
 import io.ktor.client.plugins.logging.Logger
 import io.ktor.client.plugins.logging.Logging
+import io.ktor.http.encodedPath
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
 import pe.upeu.agrosierra.data.local.AlmacenSeguro
@@ -40,13 +41,15 @@ class HttpClientFactory(
                 bearer {
                     loadTokens {
                         val token = almacenSeguro.leerToken()
-                        if (token != null) {
+                        if (!token.isNullOrBlank()) {
                             BearerTokens(accessToken = token, refreshToken = "")
                         } else {
                             null
                         }
                     }
-                    sendWithoutRequest { true }
+                    sendWithoutRequest { request ->
+                        !request.url.encodedPath.contains("/auth/login")
+                    }
                 }
             }
         }

@@ -1,6 +1,8 @@
 package pe.upeu.agrosierra.data.repository
 
 import io.ktor.client.HttpClient
+import io.ktor.client.plugins.auth.authProvider
+import io.ktor.client.plugins.auth.providers.BearerAuthProvider
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.http.ContentType
@@ -37,6 +39,7 @@ class AuthRepositoryImpl(
             almacenSeguro.borrarToken()
             almacenSeguro.guardarSesion(sesion)
             almacenSeguro.guardarToken(dto.token)
+            httpClient.authProvider<BearerAuthProvider>()?.clearToken()
             sesion
         }
     }
@@ -47,5 +50,6 @@ class AuthRepositoryImpl(
 
     override suspend fun cerrarSesion() {
         almacenSeguro.borrarToken()
+        httpClient.authProvider<BearerAuthProvider>()?.clearToken()
     }
 }

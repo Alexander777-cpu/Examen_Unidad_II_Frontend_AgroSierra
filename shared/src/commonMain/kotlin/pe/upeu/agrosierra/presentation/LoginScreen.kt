@@ -9,8 +9,10 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -28,6 +30,8 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
+import pe.upeu.agrosierra.presentation.util.Visibility
+import pe.upeu.agrosierra.presentation.util.VisibilityOff
 
 @Composable
 fun LoginScreen(
@@ -89,10 +93,9 @@ fun LoginScreen(
             ),
             trailingIcon = {
                 IconButton(onClick = { claveVisible = !claveVisible }) {
-                    Text(
-                        text = if (claveVisible) "Ocultar" else "Ver",
-                        style = MaterialTheme.typography.labelMedium,
-                        color = MaterialTheme.colorScheme.primary
+                    Icon(
+                        imageVector = if (claveVisible) Icons.Default.VisibilityOff else Icons.Default.Visibility,
+                        contentDescription = if (claveVisible) "Ocultar contraseña" else "Mostrar contraseña"
                     )
                 }
             }

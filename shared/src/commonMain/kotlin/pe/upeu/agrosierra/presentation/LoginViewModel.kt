@@ -55,6 +55,7 @@ class LoginViewModel(
                 val mensaje = when (throwable) {
                     is ErrorApiException -> when (val apiError = throwable.errorApi) {
                         is ErrorApi.NoAutorizado -> "Credenciales incorrectas"
+                        is ErrorApi.SinPermiso -> "No tiene permisos para realizar esta acción"
                         is ErrorApi.Validacion -> apiError.porCampo.values.firstOrNull() ?: "Error de validación"
                         is ErrorApi.Conflicto -> apiError.mensaje
                         is ErrorApi.NoEncontrado -> "Recurso no encontrado"

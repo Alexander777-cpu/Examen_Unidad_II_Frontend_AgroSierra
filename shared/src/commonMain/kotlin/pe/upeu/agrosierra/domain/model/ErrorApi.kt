@@ -5,6 +5,7 @@ sealed interface ErrorApi {
     data object NoEncontrado : ErrorApi
     data class Conflicto(val mensaje: String) : ErrorApi
     data object NoAutorizado : ErrorApi
+    data object SinPermiso : ErrorApi
     data object Servidor : ErrorApi
     data object SinConexion : ErrorApi
     data object TiempoAgotado : ErrorApi

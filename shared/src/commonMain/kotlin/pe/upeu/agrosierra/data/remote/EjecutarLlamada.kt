@@ -13,32 +13,48 @@ import pe.upeu.agrosierra.domain.model.ErrorApi
 class ErrorApiException(val errorApi: ErrorApi) : Exception(errorApi.toString())
 
 suspend inline fun <reified T> ejecutarLlamada(
-    block: () -> HttpResponse
+    crossinline block: suspend () -> HttpResponse
 ): Result<T> {
     return try {
         val response = block()
         when (response.status) {
             HttpStatusCode.OK, HttpStatusCode.Created, HttpStatusCode.Accepted -> {
-                Result.success(response.body<T>())
+                if (Unit is T) {
+                    Result.success(Unit as T)
+                } else {
+                    Result.success(response.body<T>())
+                }
+            }
+            HttpStatusCode.NoContent -> {
+                if (Unit is T) {
+                    Result.success(Unit as T)
+                } else {
+                    Result.failure(ErrorApiException(ErrorApi.Servidor))
+                }
             }
             HttpStatusCode.BadRequest -> {
                 val errorText = response.bodyAsText()
                 val erroresCampo = parsearErroresValidacion(errorText)
+                val mensaje = parsearMensajeError(errorText)
                 if (erroresCampo.isNotEmpty()) {
                     Result.failure(ErrorApiException(ErrorApi.Validacion(erroresCampo)))
                 } else {
-                    Result.failure(ErrorApiException(ErrorApi.Conflicto(errorText.ifBlank { "Solicitud incorrecta" })))
+                    Result.failure(ErrorApiException(ErrorApi.Conflicto(mensaje ?: "Solicitud incorrecta")))
                 }
             }
-            HttpStatusCode.Unauthorized, HttpStatusCode.Forbidden -> {
+            HttpStatusCode.Unauthorized -> {
                 Result.failure(ErrorApiException(ErrorApi.NoAutorizado))
+            }
+            HttpStatusCode.Forbidden -> {
+                Result.failure(ErrorApiException(ErrorApi.SinPermiso))
             }
             HttpStatusCode.NotFound -> {
                 Result.failure(ErrorApiException(ErrorApi.NoEncontrado))
             }
             HttpStatusCode.Conflict -> {
                 val errorText = response.bodyAsText()
-                Result.failure(ErrorApiException(ErrorApi.Conflicto(errorText)))
+                val mensaje = parsearMensajeError(errorText) ?: errorText
+                Result.failure(ErrorApiException(ErrorApi.Conflicto(mensaje)))
             }
             HttpStatusCode.InternalServerError, HttpStatusCode.BadGateway, HttpStatusCode.ServiceUnavailable -> {
                 Result.failure(ErrorApiException(ErrorApi.Servidor))
@@ -69,5 +85,14 @@ fun parsearErroresValidacion(jsonStr: String): Map<String, String> {
         map
     } catch (_: Exception) {
         emptyMap()
+    }
+}
+
+fun parsearMensajeError(jsonStr: String): String? {
+    return try {
+        val jsonObj = Json.parseToJsonElement(jsonStr).jsonObject
+        jsonObj["message"]?.jsonPrimitive?.content
+    } catch (_: Exception) {
+        null
     }
 }
