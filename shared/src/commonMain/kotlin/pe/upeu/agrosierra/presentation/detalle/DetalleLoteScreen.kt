@@ -9,6 +9,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
@@ -37,10 +39,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import pe.upeu.agrosierra.domain.model.Labor
 import pe.upeu.agrosierra.domain.model.Lote
 import pe.upeu.agrosierra.presentation.padron.StatusChip
+import pe.upeu.agrosierra.presentation.util.Schedule
+import pe.upeu.agrosierra.presentation.util.Sync
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -84,6 +89,22 @@ fun DetalleLoteScreen(
                     }
                 },
                 actions = {
+                    if (uiState.sincronizando) {
+                        CircularProgressIndicator(
+                            modifier = Modifier
+                                .padding(horizontal = 12.dp)
+                                .size(24.dp),
+                            color = MaterialTheme.colorScheme.primary,
+                            strokeWidth = 2.dp
+                        )
+                    } else {
+                        IconButton(onClick = viewModel::sincronizarPendientes) {
+                            Icon(
+                                imageVector = Icons.Default.Sync,
+                                contentDescription = "Sincronizar datos"
+                            )
+                        }
+                    }
                     if (puedeCerrarCampania) {
                         IconButton(onClick = viewModel::cerrarCampania) {
                             Icon(
@@ -229,11 +250,21 @@ fun LaborCard(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(
-                    text = labor.tipo.name,
-                    style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.primary
-                )
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(
+                        text = labor.tipo.name,
+                        style = MaterialTheme.typography.titleMedium,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                    if (!labor.sincronizado) {
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Icon(
+                            imageVector = Icons.Default.Schedule,
+                            contentDescription = "Pendiente de sincronización",
+                            tint = Color.Gray
+                        )
+                    }
+                }
                 Text(
                     text = labor.fecha,
                     style = MaterialTheme.typography.bodySmall,
@@ -251,6 +282,15 @@ fun LaborCard(
 
             if (labor.observacion.isNotBlank()) {
                 Text("Obs: ${labor.observacion}", style = MaterialTheme.typography.bodySmall)
+            }
+
+            if (!labor.sincronizado) {
+                Spacer(modifier = Modifier.height(2.dp))
+                Text(
+                    text = "Pendiente de sincronización",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = Color.Gray
+                )
             }
 
             if (puedeEditar || puedeEliminar) {

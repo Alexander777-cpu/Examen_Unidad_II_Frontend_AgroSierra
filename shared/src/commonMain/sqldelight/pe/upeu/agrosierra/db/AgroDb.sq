@@ -1,16 +1,54 @@
-CREATE TABLE IF NOT EXISTS sesion_entity (
+CREATE TABLE IF NOT EXISTS LoteEntity (
     id INTEGER NOT NULL PRIMARY KEY,
-    token TEXT NOT NULL,
-    usuario TEXT NOT NULL,
-    nombreCompleto TEXT NOT NULL
+    codigo TEXT NOT NULL,
+    nombre TEXT NOT NULL,
+    hectareas REAL NOT NULL,
+    cultivo TEXT NOT NULL,
+    valle TEXT NOT NULL,
+    campaniaCerrada INTEGER NOT NULL DEFAULT 0,
+    dosisMaximaPorHectarea REAL NOT NULL
 );
 
-obtenerSesion:
-SELECT * FROM sesion_entity LIMIT 1;
+CREATE TABLE IF NOT EXISTS LaborEntity (
+    id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    servidorId INTEGER,
+    loteId INTEGER NOT NULL,
+    tipo TEXT NOT NULL,
+    fecha TEXT NOT NULL,
+    responsable TEXT NOT NULL,
+    cantidad REAL NOT NULL,
+    observacion TEXT,
+    sincronizado INTEGER NOT NULL DEFAULT 1
+);
 
-guardarSesion:
-INSERT OR REPLACE INTO sesion_entity(id, token, usuario, nombreCompleto)
-VALUES (1, ?, ?, ?);
+selectAllLotes:
+SELECT * FROM LoteEntity;
 
-borrarSesion:
-DELETE FROM sesion_entity;
+selectLoteById:
+SELECT * FROM LoteEntity WHERE id = ?;
+
+insertLote:
+INSERT OR REPLACE INTO LoteEntity(id, codigo, nombre, hectareas, cultivo, valle, campaniaCerrada, dosisMaximaPorHectarea)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?);
+
+selectAllLaboresByLote:
+SELECT * FROM LaborEntity WHERE loteId = ?;
+
+insertLabor:
+INSERT OR REPLACE INTO LaborEntity(id, servidorId, loteId, tipo, fecha, responsable, cantidad, observacion, sincronizado)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);
+
+selectLaboresPendientes:
+SELECT * FROM LaborEntity WHERE sincronizado = 0;
+
+updateLaborServidorId:
+UPDATE LaborEntity SET servidorId = ?, sincronizado = 1 WHERE id = ?;
+
+deleteLaborLocal:
+DELETE FROM LaborEntity WHERE id = ? OR servidorId = ?;
+
+deleteAllLotes:
+DELETE FROM LoteEntity;
+
+deleteAllLabores:
+DELETE FROM LaborEntity;

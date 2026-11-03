@@ -7,6 +7,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import pe.upeu.agrosierra.data.repository.SyncManager
 import pe.upeu.agrosierra.domain.repository.AuthRepository
 import pe.upeu.agrosierra.domain.repository.LaborRepository
 import pe.upeu.agrosierra.domain.repository.LoteRepository
@@ -15,7 +16,8 @@ class DetalleLoteViewModel(
     private val loteId: Long,
     private val loteRepository: LoteRepository,
     private val laborRepository: LaborRepository,
-    private val authRepository: AuthRepository
+    private val authRepository: AuthRepository,
+    private val syncManager: SyncManager
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(DetalleLoteUiState())
@@ -44,6 +46,19 @@ class DetalleLoteViewModel(
                 _uiState.update { it.copy(cargando = false, labores = listaLabores) }
             }.onFailure { throwable ->
                 _uiState.update { it.copy(cargando = false, error = throwable.message ?: "Error al cargar labores") }
+            }
+        }
+    }
+
+    fun sincronizarPendientes() {
+        viewModelScope.launch {
+            _uiState.update { it.copy(sincronizando = true) }
+            val result = syncManager.sincronizarPendientes()
+            result.onSuccess {
+                _uiState.update { it.copy(sincronizando = false, mensajeExito = "Datos sincronizados con éxito") }
+                cargarDatos()
+            }.onFailure {
+                _uiState.update { it.copy(sincronizando = false, error = "Sin conexión para sincronizar") }
             }
         }
     }
