@@ -1,47 +1,81 @@
 package pe.upeu.agrosierra
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.safeContentPadding
-import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
-import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
+import androidx.compose.material3.Surface
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
-import org.jetbrains.compose.resources.painterResource
-
-import agrocampo.shared.generated.resources.Res
-import agrocampo.shared.generated.resources.compose_multiplatform
+import org.koin.compose.koinInject
+import org.koin.core.parameter.parametersOf
+import pe.upeu.agrosierra.presentation.LoginScreen
+import pe.upeu.agrosierra.presentation.LoginViewModel
+import pe.upeu.agrosierra.presentation.detalle.DetalleLoteScreen
+import pe.upeu.agrosierra.presentation.detalle.DetalleLoteViewModel
+import pe.upeu.agrosierra.presentation.labor.FormularioLaborScreen
+import pe.upeu.agrosierra.presentation.labor.FormularioLaborViewModel
+import pe.upeu.agrosierra.presentation.navigation.Screen
+import pe.upeu.agrosierra.presentation.padron.LotesScreen
+import pe.upeu.agrosierra.presentation.padron.LotesViewModel
 
 @Composable
-@Preview
-fun App() {
+fun App(
+    loginViewModel: LoginViewModel = koinInject()
+) {
+    val loginUiState by loginViewModel.uiState.collectAsState()
+    var currentScreen by remember { mutableStateOf<Screen>(Screen.Login) }
+
+    // Si hay sesión activa al arrancar y estamos en Login, redirigir a PadronLotes
+    if (loginUiState.sesion != null && currentScreen is Screen.Login) {
+        currentScreen = Screen.PadronLotes
+    }
+
     MaterialTheme {
-        var showContent by remember { mutableStateOf(false) }
-        Column(
-            modifier = Modifier
-                .background(MaterialTheme.colorScheme.primaryContainer)
-                .safeContentPadding()
-                .fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-            Button(onClick = { showContent = !showContent }) {
-                Text("Click me!")
-            }
-            AnimatedVisibility(showContent) {
-                val greeting = remember { Greeting().greet() }
-                Column(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                ) {
-                    Image(painterResource(Res.drawable.compose_multiplatform), null)
-                    Text("Compose: $greeting")
+        Surface(modifier = Modifier.fillMaxSize()) {
+            when (val screen = currentScreen) {
+                is Screen.Login -> {
+                    LoginScreen(viewModel = loginViewModel)
+                }
+                is Screen.PadronLotes -> {
+                    val lotesViewModel: LotesViewModel = koinInject()
+                    LotesScreen(
+                        viewModel = lotesViewModel,
+                        onLoteClick = { loteId ->
+                            currentScreen = Screen.DetalleLote(loteId)
+                        },
+                        onCerrarSesion = {
+                            loginViewModel.cerrarSesion()
+                            currentScreen = Screen.Login
+                        }
+                    )
+                }
+                is Screen.DetalleLote -> {
+                    val detalleViewModel: DetalleLoteViewModel = koinInject { parametersOf(screen.loteId) }
+                    DetalleLoteScreen(
+                        viewModel = detalleViewModel,
+                        onVolver = {
+                            currentScreen = Screen.PadronLotes
+                        },
+                        onRegistrarLabor = { loteId ->
+                            currentScreen = Screen.FormularioLabor(loteId = loteId, laborId = null)
+                        },
+                        onEditarLabor = { loteId, laborId ->
+                            currentScreen = Screen.FormularioLabor(loteId = loteId, laborId = laborId)
+                        }
+                    )
+                }
+                is Screen.FormularioLabor -> {
+                    val formularioViewModel: FormularioLaborViewModel = koinInject { parametersOf(screen.loteId, screen.laborId) }
+                    FormularioLaborScreen(
+                        viewModel = formularioViewModel,
+                        onVolver = {
+                            currentScreen = Screen.DetalleLote(screen.loteId)
+                        }
+                    )
                 }
             }
         }

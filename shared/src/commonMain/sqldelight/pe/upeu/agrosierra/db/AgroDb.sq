@@ -1,0 +1,16 @@
+CREATE TABLE IF NOT EXISTS sesion_entity (
+    id INTEGER NOT NULL PRIMARY KEY,
+    token TEXT NOT NULL,
+    usuario TEXT NOT NULL,
+    nombreCompleto TEXT NOT NULL
+);
+
+obtenerSesion:
+SELECT * FROM sesion_entity LIMIT 1;
+
+guardarSesion:
+INSERT OR REPLACE INTO sesion_entity(id, token, usuario, nombreCompleto)
+VALUES (1, ?, ?, ?);
+
+borrarSesion:
+DELETE FROM sesion_entity;
